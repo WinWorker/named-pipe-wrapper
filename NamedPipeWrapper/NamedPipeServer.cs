@@ -1,4 +1,4 @@
-﻿using NamedPipeWrapper.IO;
+using NamedPipeWrapper.IO;
 using NamedPipeWrapper.Threading;
 using System;
 using System.Collections.Generic;
@@ -67,7 +67,6 @@ namespace NamedPipeWrapper
         private int _nextPipeId;
 
         private volatile bool _shouldKeepRunning;
-        private volatile bool _isRunning;
 
         /// <summary>
         /// Constructs a new <c>NamedPipeServer</c> object that listens for client connections on the given <paramref name="pipeName"/>.
@@ -153,12 +152,10 @@ namespace NamedPipeWrapper
 
         private void ListenSync()
         {
-            _isRunning = true;
             while (_shouldKeepRunning)
             {
                 WaitForConnection(_pipeName, _pipeSecurity);
             }
-            _isRunning = false;
         }
 
         private void WaitForConnection(string pipeName, PipeSecurity pipeSecurity)
