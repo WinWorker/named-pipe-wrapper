@@ -158,9 +158,10 @@ namespace NamedPipeWrapper
                     if (ReceiveMessage != null)
                         ReceiveMessage(this, obj);
                 }
-                catch
+                catch (Exception ex)
                 {
                     //we must igonre exception, otherwise, the namepipe wrapper will stop work.
+                    this.OnError(ex);
                 }
             }
             
@@ -172,25 +173,24 @@ namespace NamedPipeWrapper
         /// <exception cref="SerializationException">An object in the graph of type parameter <typeparamref name="TWrite"/> is not marked as serializable.</exception>
         private void WritePipe()
         {
-            
-                while (IsConnected && _streamWrapper.CanWrite)
+            while (IsConnected && _streamWrapper.CanWrite)
+            {
+                try
                 {
-                    try
+                    //using blockcollection, we needn't use singal to wait for result.
+                    //_writeSignal.WaitOne();
+                    //while (_writeQueue.Count > 0)
                     {
-                        //using blockcollection, we needn't use singal to wait for result.
-                        //_writeSignal.WaitOne();
-                        //while (_writeQueue.Count > 0)
-                        {
-                            _streamWrapper.WriteObject(_writeQueue.Take());
-                            _streamWrapper.WaitForPipeDrain();
-                        }
+                        _streamWrapper.WriteObject(_writeQueue.Take());
+                        _streamWrapper.WaitForPipeDrain();
                     }
-                    catch
-                    {
+                }
+                catch (Exception ex)
+                {
                     //we must igonre exception, otherwise, the namepipe wrapper will stop work.
+                    this.OnError(ex);
                 }
             }
-          
         }
     }
 

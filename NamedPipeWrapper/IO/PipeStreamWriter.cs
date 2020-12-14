@@ -37,18 +37,10 @@ namespace NamedPipeWrapper.IO
         /// <exception cref="SerializationException">An object in the graph of type parameter <typeparamref name="T"/> is not marked as serializable.</exception>
         private byte[] Serialize(T obj)
         {
-            try
+            using (var memoryStream = new MemoryStream())
             {
-                using (var memoryStream = new MemoryStream())
-                {
-                    _binaryFormatter.Serialize(memoryStream, obj);
-                    return memoryStream.ToArray();
-                }
-            }
-            catch
-            {
-                //if any exception in the serialize, it will stop named pipe wrapper, so there will ignore any exception.
-                return null;
+                _binaryFormatter.Serialize(memoryStream, obj);
+                return memoryStream.ToArray();
             }
         }
 
